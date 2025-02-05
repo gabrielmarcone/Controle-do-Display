@@ -6,6 +6,7 @@
 #include "ws2812.pio.h"
 #include "lib/ssd1306.h"
 #include "lib/font.h"
+#include "lib/number_matrix.h"
 
 // Váriaveis para os pinos do LED RGB
 #define LED_GREEN 11
@@ -13,8 +14,8 @@
 #define LED_RED 13
 
 // Estado dos LEDs
-volatile bool state_green_led = false;
-volatile bool state_blue_led = false;
+bool state_green_led = false;
+bool state_blue_led = false;
 
 // Variáveis para os pinos dos botões
 #define BUTTON_A 5
@@ -28,12 +29,15 @@ volatile uint32_t last_press_time_A = 0;
 volatile uint32_t last_press_time_B = 0;
 
 // Variáveis para a matriz de LEDs
-//#define MATRIX_PIN 7
-//#define NUM_LEDS 25
+#define MATRIX_PIN 7
+#define NUM_LEDS 25
+
+// Variável global para cor atual
+uint32_t color;
 
 // Variáveis globais para o controle PIO
-//static PIO  pio = pio0;
-//static uint sm  = 0;
+static PIO  pio = pio0;
+static uint sm  = 0;
 
 /*
 // Variáveis para a comunicação I2C
@@ -81,6 +85,26 @@ static void configure_gpio() {
     */
 }
 
+// Função para converter a intensidade de cada canal G, R, B em 24 bits
+uint32_t matrix_rgb(double g, double r, double b) {
+    unsigned char G = (unsigned char)(g * 255.0);
+    unsigned char R = (unsigned char)(r * 255.0);
+    unsigned char B = (unsigned char)(b * 255.0);
+
+    return ( (uint32_t)G << 24 ) |
+           ( (uint32_t)R << 16 ) |
+           ( (uint32_t)B <<  8 );
+}
+
+// Função para exibir números na matriz de LEDs
+void display_number(char number) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+        double intensity = number_matrix[number][i]; // Intensidade do LED
+        color = matrix_rgb(0, intensity, 0); // Ciano
+        pio_sm_put_blocking(pio, sm, color);
+    }
+}
+
 // Callback para interrupções dos botões
 void button_irq_handler(uint gpio, uint32_t events) {
     uint32_t current_time = to_ms_since_boot(get_absolute_time());
@@ -111,16 +135,69 @@ int main() {
     set_sys_clock_khz(100000, false);
 
     // Inicializa o PIO (ws2812_program)
-    //uint offset = pio_add_program(pio, &ws2812_program);
-    //sm = pio_claim_unused_sm(pio, true);
-    //ws2812_program_init(pio, sm, offset, MATRIX_PIN);
+    uint offset = pio_add_program(pio, &ws2812_program);
+    sm = pio_claim_unused_sm(pio, true);
+    ws2812_program_init(pio, sm, offset, MATRIX_PIN);
 
     // Configura as interrupções para os botões
     gpio_set_irq_enabled_with_callback(BUTTON_A, GPIO_IRQ_EDGE_FALL, true, &button_irq_handler);
     gpio_set_irq_enabled_with_callback(BUTTON_B, GPIO_IRQ_EDGE_FALL, true, &button_irq_handler);
     
     while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+        if (stdio_usb_connected()) { // Certifica-se de que o USB está conectado
+            printf("Digite um caracter: \n");
+            char character;
+            if (scanf("%c", &character) == 1) { // Lê caractere da entrada padrão
+                printf("Valor digitado: '%c'\n", character);
+
+                switch (character) {
+                    case '0': {
+                        display_number(0);
+                        break;
+                    }
+                    case '1': {
+                        display_number(1);
+                        break;
+                    }
+                    case '2': {
+                        display_number(2);
+                        break;
+                    }
+                    case '3': {
+                        display_number(3);
+                        break;
+                    }
+                    case '4': {
+                        display_number(4);
+                        break;
+                    }
+                    case '5': {
+                        display_number(5);
+                        break;
+                    }
+                    case '6': {
+                        display_number(6);
+                        break;
+                    }
+                    case '7': {
+                        display_number(7);
+                        break;
+                    }
+                    case '8': {
+                        display_number(8);
+                        break;
+                    }
+                    case '9': {
+                        display_number(9);
+                        break;
+                    }
+                    default: {
+                        printf("Caracter inválido!\n");
+                        break;
+                    }
+                }
+            }
+        }
+        sleep_ms(100);
     }
 }
