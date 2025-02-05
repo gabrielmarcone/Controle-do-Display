@@ -23,45 +23,46 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico2 CACHE STRING "Board type")
+set(PICO_BOARD pico_w CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-project(U4C6O12T C CXX ASM)
+project(Display C CXX ASM)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(U4C6O12T U4C6O12T.c )
+add_executable(Display Display.c )
 
-pico_set_program_name(U4C6O12T "U4C6O12T")
-pico_set_program_version(U4C6O12T "0.1")
+pico_set_program_name(Display "Display")
+pico_set_program_version(Display "0.1")
 
 # Generate PIO header
-pico_generate_pio_header(U4C6O12T ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
+pico_generate_pio_header(Display ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(U4C6O12T 1)
-pico_enable_stdio_usb(U4C6O12T 1)
+pico_enable_stdio_uart(Display 1)
+pico_enable_stdio_usb(Display 1)
 
 # Add the standard library to the build
-target_link_libraries(U4C6O12T
+target_link_libraries(Display
         pico_stdlib)
 
 # Add the standard include files to the build
-target_include_directories(U4C6O12T PRIVATE
+target_include_directories(Display PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
 # Add any user requested libraries
-target_link_libraries(U4C6O12T 
+target_link_libraries(Display 
         hardware_i2c
         hardware_pio
-        hardware_adc
-        pico_bootrom
+        hardware_clocks
+        
         )
 
-pico_add_extra_outputs(U4C6O12T)
+pico_add_extra_outputs(Display)
+
