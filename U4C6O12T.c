@@ -4,6 +4,8 @@
 #include "hardware/pio.h"
 #include "hardware/uart.h"
 #include "pico/bootrom.h"
+#include "lib/ssd1306.h"
+#include "lib/font.h"
 
 #include "ws2812.pio.h"
 
