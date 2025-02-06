@@ -53,7 +53,7 @@ Este projeto tem como objetivo **explorar o uso de interfaces de comunicação s
 - **Botão B liga/desliga o LED azul.**
 
 ## 📸 Demonstração do Projeto
-📹 **[Assista ao vídeo demonstrativo]()**
+📹 **[Assista ao vídeo demonstrativo](https://drive.google.com/file/d/1deScaVu1OW256wDz1WTEzyoOwrBepbxC)**
 
 ## 📜 Licença
 Este projeto é de código aberto e pode ser usado livremente para fins educacionais e experimentação.
