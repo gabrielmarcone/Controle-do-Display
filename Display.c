@@ -156,6 +156,7 @@ int main() {
     char character = ' '; // Armazena o último caractere digitado
 
     printf("Digite um caracter: \n");
+
     while (true) {
         
         ssd1306_fill(&ssd, false); // Limpa o display
