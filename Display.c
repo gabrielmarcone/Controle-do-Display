@@ -7,7 +7,7 @@
 #include "ws2812.pio.h"
 #include "lib/ssd1306.h"
 #include "lib/font.h"
-#include "lib/number_matrix.h" // Biblioteca com a matriz de LEDs para exibir números
+#include "lib/draw_matrix.h" // Biblioteca com a matriz de LEDs para exibir números
 
 // Váriaveis para os pinos do LED RGB
 #define LED_GREEN 11
@@ -77,6 +77,15 @@ void display_number(char number) {
     for (int i = 0; i < NUM_LEDS; i++) {
         double intensity = number_matrix[number][i]; // Intensidade do LED
         color = matrix_rgb(0, intensity, 0); // Vermelho
+        pio_sm_put_blocking(pio, sm, color);
+    }
+}
+
+// Função para exibir o alfabeto na matriz de LEDs
+void display_alphabet(char letter) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+        double intensity = alphabet_matrix[letter][i]; // Intensidade do LED
+        color = matrix_rgb(intensity, intensity, 0); // Amarelo
         pio_sm_put_blocking(pio, sm, color);
     }
 }
@@ -181,8 +190,8 @@ int main() {
                 if (character >= '0' && character <= '9') {
                     display_number(character - '0'); // Exibe o número na matriz de LEDs
                 }
-                else if (character >= 'A' && character <= 'Z') { // Exibe as letras Maiúsculas na matriz de LEDs
-                    turn_off_matrix(); // Desliga a matriz de LEDs
+                else if (character >= 'A' && character <= 'Z') { 
+                    display_alphabet(character - 'A'); // Exibe as letras Maiúsculas na matriz de LEDs
                 }
                 else if (character >= 'a' && character <= 'z') {
                     turn_off_matrix(); // Desliga a matriz de LEDs
