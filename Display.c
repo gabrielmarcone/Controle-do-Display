@@ -3,6 +3,7 @@
 #include "hardware/i2c.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
+#include "hardware/timer.h"
 #include "ws2812.pio.h"
 #include "lib/ssd1306.h"
 #include "lib/font.h"
@@ -75,7 +76,7 @@ uint32_t matrix_rgb(double g, double r, double b) {
 void display_number(char number) {
     for (int i = 0; i < NUM_LEDS; i++) {
         double intensity = number_matrix[number][i]; // Intensidade do LED
-        color = matrix_rgb(0, intensity, 0); // Ciano
+        color = matrix_rgb(0, intensity, 0); // Vermelho
         pio_sm_put_blocking(pio, sm, color);
     }
 }
@@ -89,10 +90,10 @@ void turn_off_matrix() {
 
 // Callback para interrupções dos botões
 void button_irq_handler(uint gpio, uint32_t events) {
-    uint32_t current_time = to_ms_since_boot(get_absolute_time());
+    uint32_t current_time = to_us_since_boot(get_absolute_time());
 
     if (gpio == BUTTON_A) { // Liga/Desliga o LED Verde
-        if (current_time - last_press_time_A > DEBOUNCE_TIME) {
+        if (current_time - last_press_time_A > DEBOUNCE_TIME * 1000) { // Debounce
             last_press_time_A = current_time;  // Atualiza o tempo da última pressão
             state_green_led = !state_green_led;  // Alterna o estado
             gpio_put(LED_GREEN, state_green_led);
@@ -100,7 +101,7 @@ void button_irq_handler(uint gpio, uint32_t events) {
         }
     } 
     else if (gpio == BUTTON_B) { // Liga/Desliga o LED Azul
-        if (current_time - last_press_time_B > DEBOUNCE_TIME) {
+        if (current_time - last_press_time_B > DEBOUNCE_TIME * 1000) { // Debounce
             last_press_time_B = current_time;  // Atualiza o tempo da última pressão
             state_blue_led = !state_blue_led;  // Alterna o estado
             gpio_put(LED_BLUE, state_blue_led);
