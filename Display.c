@@ -144,31 +144,33 @@ int main() {
     gpio_set_irq_enabled_with_callback(BUTTON_A, GPIO_IRQ_EDGE_FALL, true, &button_irq_handler);
     gpio_set_irq_enabled_with_callback(BUTTON_B, GPIO_IRQ_EDGE_FALL, true, &button_irq_handler);
     
-    bool cor = true; // Cor do retângulo
     char character = ' '; // Armazena o último caractere digitado
 
     printf("Digite um caracter: \n");
     while (true) {
-        cor = !cor;
-        // Atualiza o conteúdo do display com animações
-        ssd1306_fill(&ssd, !cor); // Limpa o display
-        ssd1306_rect(&ssd, 3, 3, 122, 58, cor, !cor); // Desenha um retângulo
+        
+        ssd1306_fill(&ssd, false); // Limpa o display
 
+        ssd1306_draw_string(&ssd, "PICO DISPLAY", 10, 5);
+        ssd1306_draw_string(&ssd, "---------------", 4, 12);
+
+        // Exibe o estado dos LEDs no display
         if (state_green_led) {
-            ssd1306_draw_string(&ssd, "LED VERDE: ON", 10, 20); // Desenha uma string
+            ssd1306_draw_string(&ssd, "LED VERDE: ON", 10, 20);
         } else {
-            ssd1306_draw_string(&ssd, "LED VERDE: OFF", 10, 20); // Desenha uma string
+            ssd1306_draw_string(&ssd, "Led Verde: OFF", 10, 20);
         }
         if (state_blue_led) {
-            ssd1306_draw_string(&ssd, "LED AZUL: ON", 10, 30); // Desenha uma string
+            ssd1306_draw_string(&ssd, "LED AZUL: ON", 10, 30);
         } else {
-            ssd1306_draw_string(&ssd, "LED AZUL: OFF", 10, 30); // Desenha uma string
-        }     
+            ssd1306_draw_string(&ssd, "Led Azul: OFF", 10, 30);
+        }
+        ssd1306_draw_string(&ssd, "---------------", 4, 38);
 
         // Exibe o caractere digitado no display
         char display_text[16];
         snprintf(display_text, sizeof(display_text), "DIGITADO: %c", character);
-        ssd1306_draw_string(&ssd, display_text, 10, 40);
+        ssd1306_draw_string(&ssd, display_text, 10, 45);
 
         if (stdio_usb_connected()) { // Certifica-se de que o USB está conectado
             int input = getchar_timeout_us(0); // Lê um caractere da entrada padrão
@@ -178,10 +180,15 @@ int main() {
 
                 if (character >= '0' && character <= '9') {
                     display_number(character - '0'); // Exibe o número na matriz de LEDs
-                } else if (character >= 'A' && character <= 'Z') {
+                }
+                else if (character >= 'A' && character <= 'Z') { // Exibe as letras Maiúsculas na matriz de LEDs
                     turn_off_matrix(); // Desliga a matriz de LEDs
-                } else {
-                    ssd1306_draw_string(&ssd, "CHAR INVALIDO", 10, 50);
+                }
+                else if (character >= 'a' && character <= 'z') {
+                    turn_off_matrix(); // Desliga a matriz de LEDs
+                }
+                else {
+                    ssd1306_draw_string(&ssd, "CAR. INVALIDO!", 10, 55);
                     printf("Caractere invalido");
                     turn_off_matrix(); // Desliga a matriz de LEDs
                 }
